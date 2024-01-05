@@ -1,0 +1,56 @@
+*,
+html,
+body,
+html::after,
+html::before,
+body::after,
+body::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+* {
+  touch-action: pan-y !important;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+  position: absolute;
+}
+
+
+.videotogether-dimensions {
+  width: 100vmin;
+}
+
+#videotogether {
+  width: 100vw;
+}
+
+.vjs-tech {
+  width: 100vw;
+  max-height: max-content;
+  /* max-height: 90vh; */
+  /* height: 100vh; */
+}
+
+.videoLi {
+  background-color: aliceblue;
+  width: 80%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
