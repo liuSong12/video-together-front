@@ -1,7 +1,16 @@
-# Vue 3 + Vite
+# videoTegether
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 介绍
 
-## Recommended IDE Setup
+本项目是 Vue 3 + Vite 开发的在线聊天应用，需要配合后端项目一起使用，后端项目地址：[video-together-back](https://github.com/liuSong12/video-together-back).
+实现功能有：
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+- 登录注册
+- 聊天室
+- 视频通话
+- 点对点聊天
+- 群聊
+- 私聊
+- 音视频通话
+- 屏幕共享
+
