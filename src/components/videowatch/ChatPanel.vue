@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from "vue"
+import { ref, nextTick} from "vue"
 import socketClass from "../../utils/socket"
 import { useRoomStore } from "../../store/roomStore"
 import { useUserStore } from "../../store/userStore"
@@ -62,11 +62,11 @@ const chatPanel = ref()
 const emites = defineEmits(["scroll"])
 
 let token = localStorage.getItem("token")
-const avatar = (src) =>{
-    if(!src){
+const avatar = (src) => {
+    if (!src) {
         return '/avatar.png'
-    }else{
-        return `/api/user/${src}?authorization=${token}` 
+    } else {
+        return `/api/user/${src}?authorization=${token}`
     }
 }
 
@@ -74,10 +74,14 @@ const timeParse = (time) => {
     return new Date(Number(time)).toLocaleString()
 }
 
-
 socket.waitMessage("chat", (data) => {
+    console.log("自动")
     let msg = data.message
     addMsg(msg)
+})
+
+defineExpose({
+    messageList
 })
 
 function addMsg(msg) {

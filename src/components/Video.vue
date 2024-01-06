@@ -163,11 +163,6 @@ function waitMessage() {
     })
 }
 
-
-
-// socket.waitMessage("")
-
-
 onBeforeUnmount(() => {
     // 销毁时释放资源
     player?.dispose()

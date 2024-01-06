@@ -10,7 +10,7 @@
         </div>
         <router-view v-slot="{ Component }">
             <keep-alive>
-                <component @scroll="scrollToTop" @updateMsg="updateWaiteMsgEvent" :is="Component" />
+                <component ref="chatChild" @scroll="scrollToTop" @updateMsg="updateWaiteMsgEvent" :is="Component" />
             </keep-alive>
         </router-view>
 
@@ -28,10 +28,23 @@ import axios from "axios";
 let roomStore = useRoomStore()
 let socket = socketClass.getInstance();
 const watchContener = ref(null)
+const chatChild = ref(null)
 
 const scrollToTop = (x) => {
     watchContener.value.scrollTop = x
 }
+
+socket.waitMessage("chat", (data) => {
+    let list = localStorage.getItem("newMssage", data.videoName)
+    if(list){
+        let listInfo = JSON.parse(list)
+        listInfo = listInfo.push(data.message)
+        localStorage.setItem("newMssage", JSON.stringify(listInfo))
+    }else{
+        let newInfo = [JSON.stringify(data.message)]
+        localStorage.setItem("newMssage", newInfo)
+    }
+})
 
 onUnmounted(() => {
     axios(`/api/user/leaveRoom?roomId=${roomStore.roomId}`)
