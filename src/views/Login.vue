@@ -15,6 +15,8 @@
 import { reactive } from 'vue';
 import axios from "axios"
 import {useRouter} from "vue-router"
+import {useUserStore} from '../store/userStore'
+const userStore = useUserStore()
 
 const router = useRouter()
 const data = reactive({
@@ -24,8 +26,8 @@ const data = reactive({
 function onSubmit(values) {
     console.log(values.phone)
     axios.post("/api/user/login",{phone:values.phone}).then(res=>{
-        console.log(res.data)
         if(res.data.code!==0) return;
+        userStore.setUser(res.data.data)
         router.push("/")
     })
 }

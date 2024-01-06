@@ -11,6 +11,7 @@
   "dependencies": {
     "axios": "^1.6.3",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "vant": "^4.8.1",
     "video.js": "^8.6.1",
     "vite-plugin-babel": "^1.2.0",

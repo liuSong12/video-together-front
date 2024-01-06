@@ -129,7 +129,7 @@ function waitMessage() {
         })
     })
     //=======================
-    socket.waitMessage("joinRoom", (data) => {
+    socket.waitMessage("joinRoom", (data) => { 
         roomStore.setRoomUsers(JSON.parse(data.message).users)
     })
     socket.waitMessage("timeupdate", (data) => {
@@ -148,7 +148,6 @@ function waitMessage() {
         })
     })
     socket.waitMessage("synchronizeTimeAsRoomHost", (data) => {
-        console.log("该去同步了：",data)
         player.src({
             src: `/api/startView?videoName=${data.message.src}&authorization=${token}`,
             type: "application/x-mpegURL" // 告诉videojs,这是一个hls流

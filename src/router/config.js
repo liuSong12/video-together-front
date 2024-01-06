@@ -29,6 +29,16 @@ const routes = [
         component: () => import('../views/UploadVideo.vue')
     },
     {
+        path: "/userchange",
+        name: "userChange",
+        component: ()=>import("../views/UserChange.vue")
+    },
+    {
+        path: "/facetoface",
+        name: "FaceToFace",
+        component: ()=>import("../views/FaceToFace.vue")
+    },
+    {
         path: "/home",
         name: "home",
         component: ()=>import("../views/Home.vue")

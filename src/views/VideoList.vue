@@ -40,6 +40,7 @@ const getImg = (item) => {
 }
 
 const onClick = (item)=>{
+    localStorage.setItem("videoName", item)
     router.push({
         name: 'videoWatch',
         query: {

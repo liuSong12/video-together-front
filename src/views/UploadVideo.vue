@@ -48,7 +48,6 @@ const fileName = computed(() => (name, progress) => {
 onUnmounted(()=>{
     socket.canclelWaitMsg("completeUpload")
     socket.canclelWaitMsg("completeSlice")
-    socket.closeConnection()
 })
 
 socket.waitMessage("completeUpload", (data) => {

@@ -41,7 +41,7 @@ class WebSocketSingleton {
         return WebSocketSingleton.instance;
     }
     closeConnection() {
-        WebSocketSingleton.instance.socket?.close()
+        WebSocketSingleton.instance?.socket?.close()
         WebSocketSingleton.instance = null
     }
     waitMessage(type, callBack) {
@@ -51,9 +51,7 @@ class WebSocketSingleton {
         Reflect.deleteProperty(WebSocketSingleton.instance.message, type)
     }
     sendMsg({ roomId = roomStore.roomId || null, userId = null, message = null, type }) {
-        if (WebSocketSingleton.instance.t) {
-            return;
-        }
+        if (WebSocketSingleton.instance.t) return;
         let token = localStorage.getItem("token")
         WebSocketSingleton.instance.t = setTimeout(() => {
             let data = JSON.stringify({

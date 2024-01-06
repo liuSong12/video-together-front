@@ -2,6 +2,7 @@
 import { showNotify } from 'vant';
 import axios from 'axios';
 
+
 //监听网络错误
 axios.defaults.timeout = 5000;
 
@@ -81,8 +82,6 @@ axios.interceptors.response.use(function (response) {
             type: 'danger',
         })
     }
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
     return Promise.reject(error);
 });
 
