@@ -1,7 +1,7 @@
 <template>
     <div ref="chatPanel" style="padding-bottom: 100px;">
 
-        <div v-for="item in messageList">
+        <div v-for="item in messageStore.messageList">
             <div class="message-div" v-if="item.from !== userStore.user?.id">
                 <div class="avatar">
                     <img :src="avatar(item.avatar)" />
@@ -31,7 +31,7 @@
                 </div>
             </div>
         </div>
-        <van-empty v-if="messageList.length === 0" description="暂无新消息" />
+        <van-empty v-if="messageStore.messageList.length === 0" description="暂无新消息" />
 
         <div class="footer">
             <div class="footer-content">
@@ -50,13 +50,14 @@ import { ref, nextTick} from "vue"
 import socketClass from "../../utils/socket"
 import { useRoomStore } from "../../store/roomStore"
 import { useUserStore } from "../../store/userStore"
+import { useMessageStore } from "../../store/ChatMessageStore"
+const messageStore = useMessageStore();
 const userStore = useUserStore();
 const roomStore = useRoomStore();
 
 let socket = socketClass.getInstance();
 const text = ref("")
 const hidediv = ref(null)
-const messageList = ref([])
 const chatPanel = ref()
 
 const emites = defineEmits(["scroll"])
@@ -75,23 +76,21 @@ const timeParse = (time) => {
 }
 
 socket.waitMessage("chat", (data) => {
-    console.log("自动")
+    if (!messageStore.isEnterChatPage) {
+        messageStore.addNewMsg()
+    }
     let msg = data.message
     addMsg(msg)
 })
 
-defineExpose({
-    messageList
-})
-
 function addMsg(msg) {
     if (msg) {
-        messageList.value.push(msg)
+        messageStore.addMsg(msg)
         nextTick(() => {
             emites("scroll", chatPanel.value.scrollHeight + 50)
         })
     } else {
-        messageList.value.push({
+        messageStore.addMsg({
             message: text.value,
             from: userStore.user.id,
             avatar: userStore.user.avatar,

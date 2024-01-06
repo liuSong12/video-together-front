@@ -5,12 +5,12 @@
             <Video :videoName="videoName" :videoTogether="true" ref="videotogether" />
             <van-tabs v-model:active="active" @click-tab="onClickTab">
                 <van-tab title="房间号"></van-tab>
-                <van-tab title="聊天"></van-tab>
+                <van-tab :badge="badge" title="聊天"></van-tab>
             </van-tabs>
         </div>
         <router-view v-slot="{ Component }">
             <keep-alive>
-                <component ref="chatChild" @scroll="scrollToTop" @updateMsg="updateWaiteMsgEvent" :is="Component" />
+                <component @scroll="scrollToTop" @updateMsg="updateWaiteMsgEvent" :is="Component" />
             </keep-alive>
         </router-view>
 
@@ -20,37 +20,45 @@
 
 <script setup>
 import { useRoute, useRouter } from "vue-router"
-import { ref, onUnmounted } from "vue"
+import { ref, onUnmounted, computed } from "vue"
 import Video from "../components/Video.vue"
 import socketClass from "../utils/socket"
 import { useRoomStore } from "../store/roomStore"
 import axios from "axios";
+import { useMessageStore } from "../store/ChatMessageStore"
+
+
+const messageStore = useMessageStore();
 let roomStore = useRoomStore()
 let socket = socketClass.getInstance();
 const watchContener = ref(null)
-const chatChild = ref(null)
+
+const badge = computed(() => {
+    if (messageStore.newMsg > 0 && !messageStore.isEnterChatPage) {
+        return messageStore.newMsg
+    } else {
+        return null
+    }
+})
 
 const scrollToTop = (x) => {
     watchContener.value.scrollTop = x
 }
 
 socket.waitMessage("chat", (data) => {
-    let list = localStorage.getItem("newMssage", data.videoName)
-    if(list){
-        let listInfo = JSON.parse(list)
-        listInfo = listInfo.push(data.message)
-        localStorage.setItem("newMssage", JSON.stringify(listInfo))
-    }else{
-        let newInfo = [JSON.stringify(data.message)]
-        localStorage.setItem("newMssage", newInfo)
+    if (!messageStore.isEnterChatPage) {
+        messageStore.addNewMsg()
     }
+    let msg = data.message
+    messageStore.addMsg(msg)
 })
 
 onUnmounted(() => {
     axios(`/api/user/leaveRoom?roomId=${roomStore.roomId}`)
     roomStore.setRoomId(null)
-    socket.canclelWaitMsg("chat")
+    socket.canclelWaitMsg("chat") 
     roomStore.setRoomUsers([])
+    messageStore.resetChatList()
 })
 const router = useRouter()
 const route = useRoute()
@@ -58,10 +66,23 @@ const videoName = route.query.videoName || localStorage.getItem("videoName")
 const active = ref(0);
 const videotogether = ref(null)
 
-const updateWaiteMsgEvent = () => {
+const updateWaiteMsgEvent = () => { 
     videotogether.value.waitMessage()
 }
 const onClickTab = ({ name }) => {
+    if (name === 1) {
+        messageStore.resetNewMsg()
+        messageStore.setIsEnterChatPage(true)
+        setTimeout(() => {
+            watchContener.value.scrollTop = 10000            
+        }, 500);
+    } else {
+        messageStore.setIsEnterChatPage(false)
+        // setTimeout(() => {
+        //     console.log(11111)
+        //     watchContener.value.scrollTop = 10000
+        // }, 500)
+    }
     router.push({
         name: name === 0 ? "room" : "chatPanel",
         query: {
@@ -72,6 +93,10 @@ const onClickTab = ({ name }) => {
 </script>
 
 <style scoped>
+:deep(.van-badge__wrapper) {
+    overflow: visible;
+}
+
 .watch-contener {
     padding-top: 50px;
     background-color: #F7F8FA;

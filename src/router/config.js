@@ -1,3 +1,5 @@
+// import ChatPanel from "../components/videowatch/ChatPanel.vue"
+
 const routes = [
     {
         path:"/videoWatch",
