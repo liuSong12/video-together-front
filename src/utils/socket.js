@@ -50,10 +50,9 @@ class WebSocketSingleton {
     canclelWaitMsg(type) {
         Reflect.deleteProperty(WebSocketSingleton.instance.message, type)
     }
-    sendMsg({ roomId = roomStore.roomId || null, userId = null, message = null, type }) {
-        if (WebSocketSingleton.instance.t) return;
+    sendMsg({ roomId = roomStore.roomId || null, userId = null, message = null, type, noDebouce = false }) {
         let token = localStorage.getItem("token")
-        WebSocketSingleton.instance.t = setTimeout(() => {
+        if (noDebouce) {
             let data = JSON.stringify({
                 token,
                 roomId,
@@ -62,9 +61,21 @@ class WebSocketSingleton {
                 type
             })
             WebSocketSingleton.instance.socket.send(data)
-            clearTimeout(WebSocketSingleton.instance.t)
-            WebSocketSingleton.instance.t = null
-        }, 200);
+        } else {
+            if (WebSocketSingleton.instance.t) return;
+            WebSocketSingleton.instance.t = setTimeout(() => {
+                let data = JSON.stringify({
+                    token,
+                    roomId,
+                    userId,
+                    message,
+                    type
+                })
+                WebSocketSingleton.instance.socket.send(data)
+                clearTimeout(WebSocketSingleton.instance.t)
+                WebSocketSingleton.instance.t = null
+            }, 200);
+        }
     }
 }
 

@@ -50,6 +50,20 @@ function initVideo() {
     if (!player) {
         player = videoJs("videotogether", myVideoOptions);
     }
+    window.onorientationchange =()=> {
+        let angle = screen.orientation.angle
+        console.log(angle)
+        if (angle == 0 || angle == 180) return;
+        if (player.requestFullscreen) {
+            player.requestFullscreen();
+        } else if (player.mozRequestFullScreen) {
+            player.mozRequestFullScreen();
+        } else if (player.webkitRequestFullscreen) {
+            player.webkitRequestFullscreen();
+        } else if (player.msRequestFullscreen) {
+            player.msRequestFullscreen();
+        }
+    };
     waitMessage()
     if (!props.videoName) return;
     isShow.value = false
@@ -129,7 +143,7 @@ function waitMessage() {
         })
     })
     //=======================
-    socket.waitMessage("joinRoom", (data) => { 
+    socket.waitMessage("joinRoom", (data) => {
         roomStore.setRoomUsers(JSON.parse(data.message).users)
     })
     socket.waitMessage("timeupdate", (data) => {
@@ -166,6 +180,7 @@ function waitMessage() {
 onBeforeUnmount(() => {
     // 销毁时释放资源
     player?.dispose()
+    window.onorientationchange = null
 })
 
 </script>

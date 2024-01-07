@@ -26,6 +26,11 @@ const routes = [
         component: () => import('../views/VideoList.vue')
     },
     {
+        path:"/videochat",
+        name:"videoChat",
+        component: () => import('../views/VideoChat.vue')
+    },
+    {
         path:"/uploadvideo",
         name:"uploadvideo",
         component: () => import('../views/UploadVideo.vue')
@@ -36,9 +41,9 @@ const routes = [
         component: ()=>import("../views/UserChange.vue")
     },
     {
-        path: "/facetoface",
-        name: "FaceToFace",
-        component: ()=>import("../views/FaceToFace.vue")
+        path: "/videochatlist",
+        name: "videoChatList",
+        component: ()=>import("../views/VideoChatList.vue")
     },
     {
         path: "/home",

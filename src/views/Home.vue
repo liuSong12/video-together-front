@@ -11,7 +11,7 @@
                 <img class="ava-img-center" :src="avatar(userStore.user.avatar)" @click="changeInfo">
                 <div class="nicknamearea" @click="changeInfo">
                     <div class="say">
-                        Hi,{{userStore.user.userName || '游客'}}
+                        Hi,{{ userStore.user.userName || '游客' }}
                     </div>
                     <div class="color">
                         欢迎回来
@@ -51,7 +51,7 @@
             <van-list class="van-list">
                 <van-cell @click='goto("videoList")'>一起看电影</van-cell>
                 <van-cell @click='goto("uploadvideo")'>上传电影</van-cell>
-                <van-cell @click="goto('FaceToFace')">视频通话</van-cell>
+                <van-cell @click="goto('videoChatList')">视频通话</van-cell>
             </van-list>
         </div>
 
@@ -66,24 +66,32 @@ import { useUserStore } from "../store/userStore";
 import axios from "axios";
 import socketClass from "../utils/socket"
 let socket = socketClass.getInstance();
-
+const userStore = useUserStore();
+let router = useRouter()
+socket.waitMessage("call", (data) => {
+    router.push({
+        name: "videoChat",
+        query: {
+            info:data.message
+        }
+    })
+})
 
 let token = localStorage.getItem("token")
-const avatar = (src) =>{
-    if(!src){
+const avatar = (src) => {
+    if (!src) {
         return '/avatar.png'
-    }else{
-        return `/api/user/${src}?authorization=${token}` 
+    } else {
+        return `/api/user/${src}?authorization=${token}`
     }
 }
 
-axios("/api/user/getUser").then(res=>{
-    if(res.data.code!==0) return;
+axios("/api/user/getUser").then(res => {
+    if (res.data.code !== 0) return;
     userStore.setUser(res.data.data)
 })
-const userStore = useUserStore();
-let router = useRouter()
-const changeInfo = ()=>{
+
+const changeInfo = () => {
     router.push("userChange")
 }
 
@@ -229,4 +237,5 @@ const goto = (route) => {
             }
         }
     }
-}</style>
+}
+</style>

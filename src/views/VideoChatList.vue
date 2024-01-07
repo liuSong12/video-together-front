@@ -26,7 +26,6 @@ socket.waitMessage("online",(data)=>{
 axios("/api/user/allUser").then(res=>{
     if(res.data.code!==0) return;
     userList.value = res.data.data
-    console.log(res.data)
 })
 
 const router = useRouter()
