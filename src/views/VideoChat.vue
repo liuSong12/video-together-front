@@ -1,7 +1,9 @@
 <template>
     <div class="video-div">
-        <video v-if="localVideoIsShow" class="video-local full-screen" ref="videoLocal"></video>
-        <video v-if="remoteVideoIsShow" class="video-remote small-video" ref="videoRemote"></video>
+        <video @click="tagger(true)" v-if="localVideoIsShow" :class="maxIsLocal ? 'full-screen' : 'small-video'"
+            ref="videoLocal"></video>
+        <video @click="tagger(false)" v-if="remoteVideoIsShow" :class="maxIsLocal ? 'small-video' : 'full-screen'"
+            ref="videoRemote"></video>
         <div class="btns">
             <van-button @click="btnClick(true)" round type="success" v-if="btnAcceptIsShow" ref="btnAccept"
                 class="accept-video">
@@ -19,14 +21,16 @@
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import socketClass from "../utils/socket"
-import {showToast} from "vant"
-
+import { showToast } from "vant"
+import { showNotify, closeNotify } from 'vant';
 
 
 let socket = socketClass.getInstance();
 
 const route = useRoute()
 const router = useRouter()
+
+const maxIsLocal = ref(true)
 const videoLocal = ref(null)
 const videoRemote = ref(null)
 const btnAccept = ref(false)
@@ -39,6 +43,10 @@ let caller = false, called = false, calling = false, localStream, remoteStream, 
 
 let toId = route.query.toId
 let info = route.query.info
+
+const tagger = (flag) => {
+    maxIsLocal.value = flag
+}
 
 socket.waitMessage("accept", async (data) => {
     remoteVideoIsShow.value = true
@@ -110,13 +118,16 @@ const btnClick = async (flag) => {
         //接听
         btnAcceptIsShow.value = false
         socket.sendMsg({ type: "accept", message: { id: to }, noDebouce: true })
+        closeNotify()
     } else {
         //挂断
+        closeNotify()
         router.back()
         socket.sendMsg({ type: "hangup", message: { id: to }, noDebouce: true })
     }
 }
 onUnmounted(() => {
+    closeNotify()
     let to;
     if (toId) {
         to = toId
@@ -144,7 +155,13 @@ async function init() {
         btnCloseIsShow.value = true
         socket.sendMsg({ type: "call", message: { id: toId } })
     } else {
+        let fromUser = JSON.parse(info).fromUser
         //接收
+        showNotify({
+            type: 'success',
+            message: (fromUser.userName || "无名") + "  邀请您视频通话",
+            duration: 0
+        });
         btnCloseIsShow.value = true
         btnAcceptIsShow.value = true
         called = true
@@ -161,7 +178,7 @@ async function init() {
 
 function getMediaStream() {
     return new Promise((resolve, reject) => {
-        navigator.mediaDevices.getUserMedia({
+        navigator.mediaDevices.getDisplayMedia({
             video: true,
             audio: true
         }).then(stream => {
@@ -216,8 +233,8 @@ function getMediaStream() {
     top: 0;
     right: 0;
     width: 150px;
-    height: 200px;
-    background-color: #630a0a;
+    // height: 200px;
+    background-color: rgba(177, 175, 175, 0.5);
     z-index: 10;
 }
 

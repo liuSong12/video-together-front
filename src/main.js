@@ -18,6 +18,7 @@ app.use(Particles, {
         await loadSlim(engine);
     },
 })
+
 app.use(pinia)
 app.use(Vant)
 app.use(route)

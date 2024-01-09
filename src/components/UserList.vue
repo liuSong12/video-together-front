@@ -34,8 +34,6 @@ const props = defineProps({
         type: Array
     }
 })
-
-
 const handlerClick = (item) => {
     if(item.id === userStore.user.id){
         showToast("不能和自己聊天")

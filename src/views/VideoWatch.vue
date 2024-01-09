@@ -1,9 +1,9 @@
 <template>
     <div class="watch-contener" ref="watchContener">
         <!-- 添加弹幕 -->
-        <!-- <span class="bullet-chat" :key="item.top" @animationend="animationend(item.msg)" :style="{ top: item.top + 'px' }" v-for="item in bulletChatList">
+        <span class="bullet-chat" :key="item.top" @animationend="animationend(item.msg)" :style="{ top: item.top + 'px' }" v-for="item in bulletChatList">
             {{ item.msg }}
-        </span> -->
+        </span>
         <van-nav-bar title="一起看" left-text="返回" left-arrow fixed @click-left="router.push('videoList')" />
         <div style="position: sticky; top: 0; z-index: 100;">
             <Video :videoName="videoName" :videoTogether="true" ref="videotogether" />
@@ -38,7 +38,6 @@ let socket = socketClass.getInstance();
 const watchContener = ref(null)
 const bulletChatList = ref([])
 const animationend = (msg) => {
-    console.log(msg)
     bulletChatList.value = bulletChatList.value.filter(item => item.msg !== msg)
 }
 const badge = computed(() => {

@@ -124,7 +124,6 @@ function initLocalVideo() {
                 setTimeout(() => {
                     if (!isShow.value) return;
                     const { width, height } = hidevideo.value?.getBoundingClientRect()
-                    console.log(width,height)
                     localCanvas.value.width = width
                     localCanvas.value.height = height
                     const ctx = localCanvas.value.getContext("2d");

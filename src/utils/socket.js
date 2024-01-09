@@ -17,7 +17,6 @@ class WebSocketSingleton {
                 }
             }
             WebSocketSingleton.getInstance().socket.onerror = function () {
-                console.log("连接出错，正在重连")
                 WebSocketSingleton.instance = null
                 if (timer) return;
                 timer = setInterval(() => {
@@ -28,14 +27,13 @@ class WebSocketSingleton {
 
             // //连接成功建立的回调方法  
             WebSocketSingleton.getInstance().socket.onopen = function () {
-                console.log("连接上了")
                 clearInterval(timer)
                 timer = null
             }
 
             //连接关闭的回调方法
             WebSocketSingleton.getInstance().socket.onclose = function () {
-                console.log("连接关闭了")
+                // console.log("连接关闭了")
             }
         }
         return WebSocketSingleton.instance;

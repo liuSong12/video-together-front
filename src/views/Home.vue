@@ -65,13 +65,15 @@
 import { useRouter } from "vue-router"
 import { useUserStore } from "../store/userStore";
 import axios from "axios";
-import socketClass from "../utils/socket"
 import { ref } from "vue"
+import socketClass from "../utils/socket"
+
+let socket = socketClass.getInstance();
 
 const videoNum = ref(0)
-let socket = socketClass.getInstance();
 const userStore = useUserStore();
 let router = useRouter()
+
 socket.waitMessage("call", (data) => {
     router.push({
         name: "videoChat",
@@ -80,6 +82,7 @@ socket.waitMessage("call", (data) => {
         }
     })
 })
+
 const avatarErr = ()=>{
     userStore.setUser({
         ...userStore.user,

@@ -108,7 +108,7 @@ const sendMsg = () => {
     if (roomStore.roomId) {
         let data = {
             from: userStore.user?.id,
-            avatar: userStore.user?.avatar,
+            avatar: userStore.user?.avatar || null,
             message: text.value,
             sendTime: new Date().getTime() + ""
         }
