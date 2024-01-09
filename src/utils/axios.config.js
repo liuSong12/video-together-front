@@ -33,8 +33,8 @@ window.addEventListener("offline", () => {
 })
 
 navigator.connection.addEventListener("change", () => {
-    const { effectiveType,downlink, rtt, } = navigator.connection //下载速度MB/s， 延迟ms
-    if(downlink<0.4){
+    const { effectiveType, downlink, rtt, } = navigator.connection //下载速度MB/s， 延迟ms
+    if (downlink < 0.4) {
         showNotify({
             message: `网速低：网络：${effectiveType},网速：${downlink}Mb/s,延迟：${rtt}ms`,
             type: 'warning'
@@ -47,7 +47,7 @@ navigator.connection.addEventListener("change", () => {
 axios.interceptors.request.use(function (config) {
     // Do something before request is sent
     const token = localStorage.getItem("token")
-    if(token){
+    if (token) {
         config.headers["Authorization"] = token
     }
     return config;
@@ -62,7 +62,7 @@ axios.interceptors.response.use(function (response) {
     // Do something with response data
     const res = response.data //后端返回的
     const token = response.headers.authorization
-    token && localStorage.setItem("token",token)
+    token && localStorage.setItem("token", token)
     if (res?.code === 2) {
         showNotify({
             message: '出错了:' + response.data.msg,
@@ -71,14 +71,14 @@ axios.interceptors.response.use(function (response) {
     }
     return response;
 }, function (error) {
-    const status = error?.response?.status 
-    if (status && status===401) {
+    const status = error?.response?.status
+    if (status && status === 401) {
         localStorage.removeItem("token")
         window.location.href = "#/login"
     }
     if (errResponseCode.includes(error.code)) {
         showNotify({
-            message: error.message,
+            message: error.message || "请登录",
             type: 'danger',
         })
     }

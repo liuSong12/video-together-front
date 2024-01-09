@@ -3,8 +3,8 @@
         <video id="videotogether" class="video-js vjs-default-skin" controls preload="none" x5-playsinline="" playsinline=""
             webkit-playsinline="" poster="" x-webkit-airplay="allow" muted>
         </video>
-        <canvas v-if="isShow" ref="localCanvas" class="localHide"></canvas>
-        <video v-if="isShow" ref="hidevideo" class="localHide"></video>
+        <canvas v-if="isShow" class="localHide"  ref="localCanvas" ></canvas>
+        <video v-if="isShow" class="localHide" ref="hidevideo"></video>
     </div>
 </template>
 
@@ -14,10 +14,12 @@ import videoJs from "video.js"
 import 'video.js/dist/video-js.css'
 import socketClass from "../utils/socket"
 import { useRoomStore } from "../store/roomStore"
+import {useMessageStore} from '../store/ChatMessageStore'
+import axios from 'axios'
+const messageStore = useMessageStore()
 let socket = socketClass.getInstance();
 
 const roomStore = useRoomStore()
-
 const props = defineProps({
     videoName: String,
     videoSrc: String,
@@ -34,14 +36,49 @@ let isShow = ref(true)
 const myVideoOptions = {
     bigPlayButton: true, // 是否显示播放按钮（这个播放按钮默认会再左上方，需用CSS设置居中）
     textTrackDisplay: true,
-    preload: 'none',
+    preload: true,
     posterImage: true,
     errorDisplay: true,
+    fluid: true,//自适应宽高
     controlBar: true,
     autoplay: false, // 不设置自动播放，若未true，则无法看到视频海报图片
     controls: true, //是否显示底部控制栏：true/false
     width: document.documentElement.clientWidth, //视频播放器显示的宽度
     // height: 1300, //视频播放器显示的高度
+    // controlBar: {
+    //     currentTimeDisplay: true,
+    //     timeDivider: true,
+    //     durationDisplay: true,
+    //     remainingTimeDisplay: true,
+    //     volumePanel: {
+    //         inline: true
+    //     },
+    //     children: [{
+    //         name: 'playToggle'
+    //     }, // 播放/暂停按钮
+    //     {
+    //         name: 'currentTimeDisplay'
+    //     }, // 视频当前已播放时间
+    //     {
+    //         name: 'progressControl'
+    //     }, // 播放进度条
+    //     {
+    //         name: 'durationDisplay'
+    //     }, // 视频播放总时间
+    //     {
+    //         // 倍速播放
+    //         name: 'playbackRateMenuButton',
+    //         playbackRates: [0.5, 1, 1.5, 2]
+    //     },
+    //     {
+    //         name: 'volumePanel', // 音量控制
+    //         inline: false // 不使用水平方式
+    //     },
+    //     {
+    //         name: 'FullscreenToggle'
+    //     }
+    //     ]
+    // }
 }
 
 onMounted(initVideo)
@@ -50,20 +87,11 @@ function initVideo() {
     if (!player) {
         player = videoJs("videotogether", myVideoOptions);
     }
-    window.onorientationchange =()=> {
-        let angle = screen.orientation.angle
-        console.log(angle)
-        if (angle == 0 || angle == 180) return;
-        if (player.requestFullscreen) {
-            player.requestFullscreen();
-        } else if (player.mozRequestFullScreen) {
-            player.mozRequestFullScreen();
-        } else if (player.webkitRequestFullscreen) {
-            player.webkitRequestFullscreen();
-        } else if (player.msRequestFullscreen) {
-            player.msRequestFullscreen();
-        }
-    };
+    player.on("fullscreenchange", (e) => {
+        messageStore.setIsFull()
+        e.srcElement.childNodes[0].style.width = '100%'
+        e.srcElement.childNodes[0].style.height = '100%'
+    })
     waitMessage()
     if (!props.videoName) return;
     isShow.value = false
@@ -90,12 +118,13 @@ function initLocalVideo() {
         hidevideo.value.muted = true
         hidevideo.value.play()
         hidevideo.value.addEventListener("loadedmetadata", () => {
-            let duration = hidevideo.value.duration
+            let duration = hidevideo.value?.duration
             if (!isNaN(duration)) {
                 hidevideo.value.currentTime = Math.floor(duration / 3)
                 setTimeout(() => {
                     if (!isShow.value) return;
                     const { width, height } = hidevideo.value?.getBoundingClientRect()
+                    console.log(width,height)
                     localCanvas.value.width = width
                     localCanvas.value.height = height
                     const ctx = localCanvas.value.getContext("2d");
@@ -145,6 +174,7 @@ function waitMessage() {
     //=======================
     socket.waitMessage("joinRoom", (data) => {
         roomStore.setRoomUsers(JSON.parse(data.message).users)
+        axios("/api/user/watchTogether")
     })
     socket.waitMessage("timeupdate", (data) => {
         if (Math.abs(player.currentTime() - data.message) > 6) {
@@ -180,12 +210,15 @@ function waitMessage() {
 onBeforeUnmount(() => {
     // 销毁时释放资源
     player?.dispose()
-    window.onorientationchange = null
+    messageStore.setIsFull(false)
 })
 
 </script>
 
 <style scoped lang="scss">
+:deep(.videotogether-dimensions){
+    height: 200px;
+}
 .localHide {
     // display: none;
     position: absolute;
@@ -197,10 +230,14 @@ onBeforeUnmount(() => {
 .video-container {
     width: 100%;
 }
+// :deep(.vjs-poster){
+//     height: 200px;
+// }
 
-.video-js {
-    touch-action: pan-y;
-    height: 200px;
+:deep(.video-js) {
+    // touch-action: pan-y;
+    height: 200px !important;
+    padding: 0 !important;
 
     .vjs-tech {
         width: 100%;

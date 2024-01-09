@@ -8,10 +8,10 @@
         </div>
         <div class="top-nav">
             <div class="nav-left">
-                <img class="ava-img-center" :src="avatar(userStore.user.avatar)" @click="changeInfo">
+                <img class="ava-img-center" @error="avatarErr" :src="avatar(userStore.user.avatar)" @click="changeInfo">
                 <div class="nicknamearea" @click="changeInfo">
                     <div class="say">
-                        Hi,{{ userStore.user.userName || '游客' }}
+                        Hi,{{ userStore.user.userName || '无名' }}
                     </div>
                     <div class="color">
                         欢迎回来
@@ -23,7 +23,7 @@
         <div class="tips">
             <div class="tips-item">
                 <div class="tips-item-top">
-                    12
+                    {{ videoNum }}
                 </div>
                 <div class="tips-item-bottom">
                     影视数量
@@ -31,7 +31,7 @@
             </div>
             <div class="tips-item">
                 <div class="tips-item-top">
-                    12：52
+                    {{ timeFormate(userStore.user.lastTogetherWatch) }}
                 </div>
                 <div class="tips-item-bottom">
                     上次一起看
@@ -39,7 +39,7 @@
             </div>
             <div class="tips-item">
                 <div class="tips-item-top">
-                    20:00
+                    {{ timeFormate(userStore.user.lastUpdateTime) }}
                 </div>
                 <div class="tips-item-bottom">
                     上次操作时间
@@ -52,6 +52,7 @@
                 <van-cell @click='goto("videoList")'>一起看电影</van-cell>
                 <van-cell @click='goto("uploadvideo")'>上传电影</van-cell>
                 <van-cell @click="goto('videoChatList')">视频通话</van-cell>
+                <van-cell @click="goto('login')">退出</van-cell>
             </van-list>
         </div>
 
@@ -65,6 +66,9 @@ import { useRouter } from "vue-router"
 import { useUserStore } from "../store/userStore";
 import axios from "axios";
 import socketClass from "../utils/socket"
+import { ref } from "vue"
+
+const videoNum = ref(0)
 let socket = socketClass.getInstance();
 const userStore = useUserStore();
 let router = useRouter()
@@ -72,10 +76,16 @@ socket.waitMessage("call", (data) => {
     router.push({
         name: "videoChat",
         query: {
-            info:data.message
+            info: data.message
         }
     })
 })
+const avatarErr = ()=>{
+    userStore.setUser({
+        ...userStore.user,
+        avatar: ''
+    })
+}
 
 let token = localStorage.getItem("token")
 const avatar = (src) => {
@@ -86,9 +96,23 @@ const avatar = (src) => {
     }
 }
 
+const timeFormate = (t) => {
+    if(!t) return "Invalid Date"
+    let t2 = new Date(t)
+    let y = (t2.getFullYear()+'').substring(2)
+    let m = ((t2.getMonth() + 1) + '').padStart(2, '0')
+    let d = (t2.getDate() + '').padStart(2, '0')
+    let h = (t2.getHours() + '').padStart(2, '0')
+    let mm = (t2.getMinutes() + '').padStart(2, '0')
+    return y + "/" + m + "/" + d + " " + h + ":" + mm
+}
+
 axios("/api/user/getUser").then(res => {
     if (res.data.code !== 0) return;
     userStore.setUser(res.data.data)
+})
+axios("/api/getVideoList").then(res => {
+    videoNum.value = res.data.length
 })
 
 const changeInfo = () => {

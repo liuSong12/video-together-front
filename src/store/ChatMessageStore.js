@@ -5,6 +5,14 @@ export const useMessageStore = defineStore("messageStore", () => {
     const messageList = ref([])
     const isEnterChatPage = ref(false)
     const newMsg = ref(0)
+    const isFull = ref(false)
+    const setIsFull = (flag) => {
+        if(flag){
+            isFull.value = flag
+        }else{
+            isFull.value = !isFull.value
+        }
+    }
     const addNewMsg = () => {
         newMsg.value++
     }
@@ -22,6 +30,8 @@ export const useMessageStore = defineStore("messageStore", () => {
     }
 
     return {
+        isFull,
+        setIsFull,
         newMsg,
         addNewMsg,
         resetNewMsg,

@@ -34,7 +34,17 @@ function upload(file) {
             //构造formdata
             let formDataArr = chunksToFormData(chunks, hash, preUpload)
             //并发上传
-            await requestUpload(formDataArr, maxRequest, file, hash)
+            let resultArr = await requestUpload(formDataArr, maxRequest, file, hash)
+            for (let index = 0; index < resultArr.length; index++) {
+                const element = array[index];
+                if(element!=="上传成功"){
+                    reject({
+                        message: "部分分片超时",
+                        type: 'danger'
+                    })
+                    return;
+                }
+            }
             //发起合并
             await requestMerge(hash, file)
             resolve({
@@ -89,9 +99,14 @@ function filterRepeat(hash, e) {
 
 function requestMerge(hash, file) {
     return new Promise((resolve, reject) => {
+        let i = file.name.lastIndexOf("."),fileExtension="";
+        if(i!==-1){
+            fileExtension=file.name.substring(i)
+        }
         axios.post("/api/merge", {
             fileHash: hash,
-            fileName: file.name
+            fileName: file.name,
+            fileExtension
         }).then(res => {
             resolve(res.data)
         }).catch(err => {

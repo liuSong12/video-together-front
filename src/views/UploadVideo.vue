@@ -45,13 +45,13 @@ const fileName = computed(() => (name, progress) => {
     return n
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     socket.canclelWaitMsg("completeUpload")
     socket.canclelWaitMsg("completeSlice")
 })
 
 socket.waitMessage("completeUpload", (data) => {
-    if (!checkHash()) return;
+    if (!checkHash(data)) return;
     showNotify({
         //这里合并切片好了，但是没有ffmpeg处理
         message: "可以边看边上传了",
@@ -67,7 +67,7 @@ socket.waitMessage("completeUpload", (data) => {
 })
 
 socket.waitMessage("completeSlice", (data) => {
-    if (!checkHash()) return;
+    if (!checkHash(data)) return;
     progressStore.removeProgress(data.message)
     //这里合并切片好了，ffmpeg处理也好了
     showNotify({
@@ -125,9 +125,7 @@ const onInputChange = () => {
 </script>
 
 
-<style scoped lang="scss"> .van-progress__portion {
-     // overflow: hidden;
- }
+<style scoped lang="scss"> 
 
  :deep(.van-progress__pivot) {
      overflow: hidden;
@@ -146,7 +144,7 @@ const onInputChange = () => {
 
      .uploader-video {
          width: 100%;
-         //  height: 200px;
+         height: 200px;
      }
 
      .uploader-model {
