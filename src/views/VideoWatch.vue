@@ -24,7 +24,7 @@
 
 <script setup>
 import { useRoute, useRouter } from "vue-router"
-import { ref, onUnmounted, computed } from "vue"
+import { ref, onUnmounted, computed,onMounted } from "vue"
 import Video from "../components/Video.vue"
 import socketClass from "../utils/socket"
 import { useRoomStore } from "../store/roomStore"
@@ -85,6 +85,30 @@ const route = useRoute()
 const videoName = route.query.videoName || localStorage.getItem("videoName")
 const active = ref(0);
 const videotogether = ref(null)
+
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        let time = null;
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                if (!time) {
+                    time = new Date().getTime();
+                    plus.nativeUI.toast("再按一次退出一起看", {
+                        duration: 'short'
+                    });
+                    setTimeout(function () {
+                        time = null;
+                    }, 1000);
+                } else {
+                    if (new Date().getTime() - time < 1000) {
+                        router.push("videoList")
+                    }
+                }
+            })
+        });
+    })
+})
 
 const updateWaiteMsgEvent = () => {
     videotogether.value.waitMessage()

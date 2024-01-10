@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref ,onMounted} from 'vue';
 import { useRouter } from "vue-router"
 import { showToast } from 'vant';
 import { useUserStore } from "../store/userStore"
@@ -35,6 +35,17 @@ const userStore = useUserStore()
 const router = useRouter()
 const username = ref('');
 const avatar = ref([]);
+
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                router.push("home")
+            })
+        });
+    })
+})
 
 const onSubmit = async () => {
     if (!avatar.value[0] || !username.value) {

@@ -1,6 +1,7 @@
-import { defineConfig } from 'vite'
+import { defineConfig  } from 'vite'
 import vue from '@vitejs/plugin-vue'
-
+// const url = import.meta.env.baseUrl
+import config from './src/config'
 
 export default defineConfig({
   plugins: [vue()],
@@ -12,17 +13,10 @@ export default defineConfig({
     port:5174,
     proxy:{ 
       '/api':{
-        target:'http://localhost:8001',
+        target:  config.remoteOriginHttp,
         changeOrigin:true,
         rewrite:path=>path.replace(/^\/api/,'')
       }
     }
-  },
-  // css: {
-  //   preprocessorOptions: {
-  //     scss: {
-  //       additionalData: `@import "@/style.scss";`
-  //     }
-  //   }
-  // },
+  }
 })

@@ -24,7 +24,7 @@
 
 
 <script setup>
-import { ref } from 'vue';
+import { ref,onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from "vue-router"
 
@@ -36,6 +36,16 @@ const finished = ref(false);
 const refreshing = ref(false);
 const search = ref("")
 
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                router.push("home")
+            })
+        });
+    })
+})
 
 let token = localStorage.getItem("token")
 const getImg = (item) => {

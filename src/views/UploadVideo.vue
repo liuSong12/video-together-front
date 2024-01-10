@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, computed, onUnmounted } from 'vue';
+import { ref, nextTick, computed, onUnmounted,onMounted } from 'vue';
 import { useRouter } from "vue-router"
 import Video from "../components/Video.vue"
 import upload from "../utils/upload"
@@ -25,9 +25,18 @@ import { showNotify } from 'vant';
 import socketClass from "../utils/socket"
 let socket = socketClass.getInstance();
 
-
 const progressStore = useProgressStore()
 const router = useRouter()
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                router.push("home")
+            })
+        });
+    })
+})
 
 
 const videoRef = ref(null);

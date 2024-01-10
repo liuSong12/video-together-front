@@ -65,8 +65,33 @@
 import { useRouter } from "vue-router"
 import { useUserStore } from "../store/userStore";
 import axios from "axios";
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import socketClass from "../utils/socket"
+
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        let time = null;
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                if (!time) {
+                    time = new Date().getTime();
+                    plus.nativeUI.toast("再按一次退出应用", {
+                        duration: 'short'
+                    });
+                    setTimeout(function () {
+                        time = null;
+                    }, 1000);
+                } else {
+                    if (new Date().getTime() - time < 1000) {
+                        window.plus.runtime.quit();
+                        webview.close()
+                    }
+                }
+            })
+        });
+    })
+})
 
 let socket = socketClass.getInstance();
 
@@ -83,7 +108,7 @@ socket.waitMessage("call", (data) => {
     })
 })
 
-const avatarErr = ()=>{
+const avatarErr = () => {
     userStore.setUser({
         ...userStore.user,
         avatar: ''
@@ -100,9 +125,9 @@ const avatar = (src) => {
 }
 
 const timeFormate = (t) => {
-    if(!t) return "Invalid Date"
+    if (!t) return "Invalid Date"
     let t2 = new Date(t)
-    let y = (t2.getFullYear()+'').substring(2)
+    let y = (t2.getFullYear() + '').substring(2)
     let m = ((t2.getMonth() + 1) + '').padStart(2, '0')
     let d = (t2.getDate() + '').padStart(2, '0')
     let h = (t2.getHours() + '').padStart(2, '0')

@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { reactive,ref } from 'vue';
+import { reactive,ref,onMounted } from 'vue';
 import axios from "axios"
 import { useRouter } from "vue-router"
 import { useUserStore } from '../store/userStore'
@@ -34,6 +34,32 @@ const router = useRouter()
 const data = reactive({
     phone: "",
     code: "",
+})
+
+
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        let time = null;
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                if (!time) {
+                    time = new Date().getTime();
+                    plus.nativeUI.toast("再按一次退出应用", {
+                        duration: 'short'
+                    });
+                    setTimeout(function () {
+                        time = null;
+                    }, 1000);
+                } else {
+                    if (new Date().getTime() - time < 1000) {
+                        window.plus.runtime.quit();
+                        webview.close()
+                    }
+                }
+            })
+        });
+    })
 })
 
 let t;

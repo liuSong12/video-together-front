@@ -1,6 +1,6 @@
 import config from "../config"
 import { useRoomStore } from "../store/roomStore"
-let remoteWs = config.remoteOriginWs
+const remoteWs = config.remoteOriginWs
 const roomStore = useRoomStore()
 let timer;
 class WebSocketSingleton {

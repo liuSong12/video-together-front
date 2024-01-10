@@ -30,6 +30,32 @@ let socket = socketClass.getInstance();
 const route = useRoute()
 const router = useRouter()
 
+onMounted(() => {
+    document.addEventListener('plusready', function () {
+        let time = null;
+        var webview = window.plus.webview.currentWebview();
+        window.plus.key.addEventListener('backbutton', function () {
+            webview.canBack(function (e) {
+                if (!time) {
+                    time = new Date().getTime();
+                    plus.nativeUI.toast("再按一次挂断视频", {
+                        duration: 'short'
+                    });
+                    setTimeout(function () {
+                        time = null;
+                    }, 1000);
+                } else {
+                    if (new Date().getTime() - time < 1000) {
+                        closeNotify()
+                        router.back()
+                        socket.sendMsg({ type: "hangup", message: { id: to }, noDebouce: true })
+                    }
+                }
+            })
+        });
+    })
+})
+
 const maxIsLocal = ref(true)
 const videoLocal = ref(null)
 const videoRemote = ref(null)
@@ -178,7 +204,7 @@ async function init() {
 
 function getMediaStream() {
     return new Promise((resolve, reject) => {
-        navigator.mediaDevices.getDisplayMedia({
+        navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true
         }).then(stream => {
